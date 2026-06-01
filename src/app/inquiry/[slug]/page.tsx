@@ -30,8 +30,8 @@ export default async function InquiryPage({ params, searchParams }: InquiryPageP
         <div className="content-reveal checkout-card">
           <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
             <aside className="checkout-summary-panel p-6 sm:p-8 lg:p-10">
-              <p className="text-sm font-semibold uppercase tracking-wider text-emerald-700">
-                Checkout
+              <p className="text-sm font-semibold uppercase tracking-wider text-[#FF6B00]">
+                Buy Now
               </p>
               <h1 className="mt-3 text-3xl font-bold text-zinc-950 sm:text-4xl">
                 Complete your order

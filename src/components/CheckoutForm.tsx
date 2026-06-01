@@ -167,7 +167,7 @@ export function CheckoutForm({
         <p className="text-sm text-zinc-600">
           {isAdminAccount
             ? "Please use a customer account to place orders."
-            : "You must be logged in before placing any order through Checkout or Cart."}
+            : "You must be logged in before placing any order through Buy Now or Cart."}
         </p>
         <div className="mt-2 flex gap-3">
           <Link href="/login" className="btn-soft">

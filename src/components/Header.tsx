@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { CartIconLink } from "@/components/CartIconLink";
@@ -40,13 +41,21 @@ export function Header() {
   }
 
   return (
-    <header className="site-header sticky top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur">
+    <header className="site-header sticky top-0 z-50 border-b border-zinc-200 !bg-white backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="brand-text shrink-0 text-2xl font-extrabold tracking-tight text-pink-600"
+          className="brand-text shrink-0"
+          aria-label="HM shop online home"
         >
-          Storefront
+          <Image
+            src="/hm-logo.svg"
+            alt="HM shop online logo"
+            width={146}
+            height={72}
+            priority
+            className="h-14 w-auto sm:h-16"
+          />
         </Link>
 
         <div className="header-search-wrap min-w-0 flex-1">

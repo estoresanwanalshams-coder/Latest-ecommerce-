@@ -88,7 +88,7 @@ export default function ContactPage() {
                 required
               />
             </label>
-            <button className="animated-button rounded-md bg-zinc-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-zinc-700">
+            <button className="animated-button btn-soft justify-center px-6 py-3 text-sm font-bold">
               Submit
             </button>
             {notice ? (

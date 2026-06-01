@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { upsertCartProductQuantity } from "@/lib/cart";
 import type { Product } from "@/lib/products";
 
 type ProductActionBarProps = {
@@ -10,7 +11,13 @@ type ProductActionBarProps = {
 };
 
 export function ProductActionBar({ product }: ProductActionBarProps) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
+
+  function handleBuyNow() {
+    upsertCartProductQuantity(product, quantity);
+    router.push(`/inquiry/${product.slug}?qty=${quantity}`);
+  }
 
   return (
     <div className="mt-8 flex flex-col gap-3">
@@ -37,12 +44,13 @@ export function ProductActionBar({ product }: ProductActionBarProps) {
       </div>
       <div className="grid grid-cols-2 gap-3">
         <AddToCartButton product={product} quantity={quantity} className="btn-soft justify-center" />
-        <Link
-          href={`/inquiry/${product.slug}?qty=${quantity}`}
+        <button
+          type="button"
+          onClick={handleBuyNow}
           className="btn-soft justify-center"
         >
-          Checkout
-        </Link>
+          Buy Now
+        </button>
       </div>
     </div>
   );

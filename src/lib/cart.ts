@@ -83,3 +83,21 @@ export function addProductToCartWithQuantity(product: Product, quantity: number)
 
   saveCartItems([...items, { product, quantity: safeQuantity }]);
 }
+
+export function upsertCartProductQuantity(product: Product, quantity: number) {
+  const safeQuantity = Math.max(1, Math.floor(quantity));
+  const items = getCartItems();
+  const existingIndex = items.findIndex((item) => item.product.slug === product.slug);
+
+  if (existingIndex >= 0) {
+    items[existingIndex] = {
+      ...items[existingIndex],
+      product,
+      quantity: safeQuantity,
+    };
+    saveCartItems(items);
+    return;
+  }
+
+  saveCartItems([...items, { product, quantity: safeQuantity }]);
+}

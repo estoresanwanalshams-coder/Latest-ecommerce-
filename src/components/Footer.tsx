@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const footerLinks = [
   { label: "Home", href: "/"},
@@ -65,9 +66,15 @@ export function Footer() {
         <div>
           <Link
             href="/"
-            className="brand-text text-xl font-bold tracking-wide"
+            className="brand-text inline-flex items-center"
           >
-            Storefront
+            <Image
+              src="/hm-logo.svg"
+              alt="HM shop online logo"
+              width={120}
+              height={58}
+              className="h-10 w-auto"
+            />
           </Link>
 
           <p className="mt-4 max-w-md text-sm leading-6 text-zinc-300">

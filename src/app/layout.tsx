@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
+import { Poppins } from "next/font/google";
 import { ClientFloatingWidgets } from "@/components/ClientFloatingWidgets";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import "./globals.css";
 
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
-    default: "GCC General Products Store | Home, Gadgets, Baby, Auto & Beauty",
-    template: "%s | GCC General Products Store",
+    default: "HM shop online",
+    template: "%s | HM shop online",
   },
-  description:
-    "Shop general products for GCC customers including home and kitchen, electronic gadgets, baby toys, automotive accessories, and health and beauty essentials across UAE and the Gulf.",
+  description: "Shop curated products at HM shop online.",
   keywords: [
     "GCC ecommerce",
     "UAE online shopping",
@@ -22,9 +28,8 @@ export const metadata: Metadata = {
     "health beauty products UAE",
   ],
   openGraph: {
-    title: "GCC General Products Store",
-    description:
-      "Responsive ecommerce store for home, gadgets, baby, automotive, health, and beauty products in the GCC.",
+    title: "HM shop online",
+    description: "Responsive ecommerce store for curated products.",
     type: "website",
     locale: "en_AE",
   },
@@ -41,7 +46,7 @@ export default function RootLayout({
       className="h-full antialiased"
       data-scroll-behavior="smooth"
     >
-      <body className="flex min-h-full flex-col">
+      <body className={`${poppins.className} flex min-h-full flex-col`}>
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
