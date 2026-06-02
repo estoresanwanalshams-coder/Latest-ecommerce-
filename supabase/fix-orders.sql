@@ -57,3 +57,29 @@ on public.orders
 for select
 to authenticated
 using (lower(email) = lower(auth.jwt() ->> 'email'));
+
+-- Guest order tracking: a security-definer function so guests (anon role)
+-- can look up ONLY orders they already know the identifier for, without
+-- exposing a blanket SELECT on the orders table.
+create or replace function public.track_order(p_identifier text)
+returns setof public.orders
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_id text := trim(coalesce(p_identifier, ''));
+  v_digits text := regexp_replace(coalesce(p_identifier, ''), '\D', '', 'g');
+begin
+  return query
+  select *
+  from public.orders o
+  where lower(o.email) = lower(v_id)
+     or o.order_number = v_id
+     or (length(v_digits) >= 6 and regexp_replace(o.phone, '\D', '', 'g') = v_digits)
+  order by o.created_at desc
+  limit 20;
+end;
+$$;
+
+grant execute on function public.track_order(text) to anon, authenticated;

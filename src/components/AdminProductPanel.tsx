@@ -45,6 +45,7 @@ type ManagedImage = {
 
 export function AdminProductPanel() {
   const [adminProducts, setAdminProducts] = useState<Product[]>([]);
+  const [productSearchQuery, setProductSearchQuery] = useState("");
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [form, setForm] = useState<ProductForm>(emptyForm);
   const [message, setMessage] = useState("");
@@ -110,6 +111,23 @@ export function AdminProductPanel() {
   }, []);
 
   const allProducts = useMemo(() => adminProducts, [adminProducts]);
+  const visibleProducts = useMemo(() => {
+    const query = productSearchQuery.trim().toLowerCase();
+    if (!query) {
+      return allProducts;
+    }
+
+    return allProducts.filter((product) => {
+      const categoryName =
+        categoryItems.find((item) => item.slug === product.categorySlug)?.name ?? "";
+      return (
+        product.name.toLowerCase().includes(query) ||
+        product.slug.toLowerCase().includes(query) ||
+        product.categorySlug.toLowerCase().includes(query) ||
+        categoryName.toLowerCase().includes(query)
+      );
+    });
+  }, [allProducts, productSearchQuery, categoryItems]);
 
   function updateForm(field: keyof ProductForm, value: string) {
     setForm((currentForm) => ({
@@ -662,6 +680,17 @@ export function AdminProductPanel() {
               {message}
             </p>
           ) : null}
+          <div className="mt-4 max-w-xl">
+            <label className="light-form-field">
+              Search products
+              <input
+                type="text"
+                value={productSearchQuery}
+                onChange={(event) => setProductSearchQuery(event.target.value)}
+                placeholder="Search by name, slug, or category"
+              />
+            </label>
+          </div>
           <div className="mt-4 flex flex-wrap gap-3">
             <button
               type="button"
@@ -685,7 +714,7 @@ export function AdminProductPanel() {
                 Loading Supabase products...
               </div>
             ) : null}
-            {allProducts.map((product) => {
+            {visibleProducts.map((product) => {
               return (
                 <article
                   key={product.slug}
@@ -736,6 +765,11 @@ export function AdminProductPanel() {
                 </article>
               );
             })}
+            {!isLoading && visibleProducts.length === 0 ? (
+              <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-zinc-600">
+                No products match your search.
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

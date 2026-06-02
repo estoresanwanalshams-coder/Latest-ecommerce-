@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { isAdminEmail } from "@/lib/auth-role";
+import { isValidPhoneNumber, normalizePhoneInput } from "@/lib/phone";
 import { createOrUpdateCustomerProfile } from "@/lib/supabase-customers";
 import { supabase } from "@/lib/supabase";
 
@@ -30,6 +31,12 @@ export default function RegisterPage() {
 
     if (password !== confirmPassword) {
       setMessage("Password and confirm password do not match.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!isValidPhoneNumber(phone)) {
+      setMessage("Please enter a valid phone number (7 to 15 digits).");
       setIsSubmitting(false);
       return;
     }
@@ -113,7 +120,10 @@ export default function RegisterPage() {
               Phone
               <input
                 value={phone}
-                onChange={(event) => setPhone(event.target.value)}
+                onChange={(event) => setPhone(normalizePhoneInput(event.target.value))}
+                inputMode="tel"
+                pattern="[0-9+()\\-\\s]{7,20}"
+                title="Enter a valid phone number"
                 required
               />
             </label>

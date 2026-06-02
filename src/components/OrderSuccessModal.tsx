@@ -22,6 +22,20 @@ export function OrderSuccessModal({ orderNumber, onClose }: OrderSuccessModalPro
           Your order number is{" "}
           <span className="font-bold text-zinc-950">{orderNumber}</span>
         </p>
+        <p className="mt-3 text-sm text-zinc-600">
+          Please check your inbox and spam folder for order details.
+        </p>
+        <p className="mt-2 text-sm text-zinc-600">
+          You can also track your order here:{" "}
+          <a
+            href="https://www.hmshoponline.com/track-order"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#FF6B00]"
+          >
+            https://www.hmshoponline.com/track-order
+          </a>
+        </p>
         <button
           type="button"
           onClick={onClose}

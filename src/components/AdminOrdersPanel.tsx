@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   fetchSupabaseOrders,
   type OrderRecord,
@@ -19,6 +19,10 @@ const statuses: OrderStatus[] = [
 export function AdminOrdersPanel() {
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [message, setMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | OrderStatus>("all");
+  const [sortOrder, setSortOrder] = useState<"latest" | "oldest">("latest");
+  const [latestOnly, setLatestOnly] = useState(false);
 
   async function loadOrders() {
     setOrders(await fetchSupabaseOrders().catch(() => []));
@@ -32,13 +36,59 @@ export function AdminOrdersPanel() {
 
   async function updateStatus(id: string, status: OrderStatus) {
     try {
+      const order = orders.find((item) => item.id === id);
       await updateSupabaseOrderStatus(id, status);
+      if (order) {
+        await fetch("/api/orders/status-notify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderNumber: order.orderNumber,
+            fullName: order.fullName,
+            email: order.email,
+            status,
+          }),
+        }).catch(() => null);
+      }
       await loadOrders();
       setMessage("Order status updated.");
     } catch {
       setMessage("Unable to update order status.");
     }
   }
+
+  const visibleOrders = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    let filtered = orders.filter((order) => {
+      const matchesStatus = statusFilter === "all" || order.status === statusFilter;
+      if (!matchesStatus) {
+        return false;
+      }
+
+      if (!query) {
+        return true;
+      }
+
+      return (
+        order.orderNumber.toLowerCase().includes(query) ||
+        order.fullName.toLowerCase().includes(query) ||
+        order.email.toLowerCase().includes(query) ||
+        order.phone.toLowerCase().includes(query)
+      );
+    });
+
+    filtered = [...filtered].sort((a, b) => {
+      const aTime = new Date(a.createdAt).getTime();
+      const bTime = new Date(b.createdAt).getTime();
+      return sortOrder === "latest" ? bTime - aTime : aTime - bTime;
+    });
+
+    if (latestOnly) {
+      filtered = filtered.slice(0, 10);
+    }
+
+    return filtered;
+  }, [latestOnly, orders, searchQuery, sortOrder, statusFilter]);
 
   return (
     <section className="page-shell border-t border-zinc-200">
@@ -54,13 +104,57 @@ export function AdminOrdersPanel() {
             {message}
           </p>
         ) : null}
+        <div className="mt-5 grid gap-3 md:grid-cols-4">
+          <label className="light-form-field">
+            Search order/customer
+            <input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Order ID, name, email, phone"
+            />
+          </label>
+          <label className="light-form-field">
+            Status filter
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value as "all" | OrderStatus)}
+            >
+              <option value="all">All statuses</option>
+              {statuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="light-form-field">
+            Sort by date
+            <select
+              value={sortOrder}
+              onChange={(event) => setSortOrder(event.target.value as "latest" | "oldest")}
+            >
+              <option value="latest">Latest first</option>
+              <option value="oldest">Oldest first</option>
+            </select>
+          </label>
+          <label className="light-form-field">
+            Quick list
+            <select
+              value={latestOnly ? "latest10" : "all"}
+              onChange={(event) => setLatestOnly(event.target.value === "latest10")}
+            >
+              <option value="all">All matching orders</option>
+              <option value="latest10">Latest 10 orders</option>
+            </select>
+          </label>
+        </div>
         <div className="mt-7 space-y-4">
-          {orders.length === 0 ? (
+          {visibleOrders.length === 0 ? (
             <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-zinc-600">
-              No orders found yet.
+              No orders found for the selected filters.
             </div>
           ) : null}
-          {orders.map((order) => (
+          {visibleOrders.map((order) => (
             <article
               key={order.id}
               className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"

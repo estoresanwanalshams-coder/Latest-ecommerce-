@@ -12,6 +12,7 @@ import {
 } from "@/lib/supabase-orders";
 import { supabase } from "@/lib/supabase";
 import { defaultSiteSettings, fetchSiteSettings } from "@/lib/site-settings";
+import { isValidPhoneNumber, normalizePhoneInput } from "@/lib/phone";
 
 type CheckoutFormProps = {
   fallbackProduct: Product;
@@ -92,6 +93,10 @@ export function CheckoutForm({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!isValidPhoneNumber(phone)) {
+      setMessage("Please enter a valid phone number (7 to 15 digits).");
+      return;
+    }
     if (!isAuthenticated && !continueAsGuest) {
       setMessage("Please login/register or continue as guest before placing an order.");
       return;
@@ -233,9 +238,11 @@ export function CheckoutForm({
           Phone number*
           <input
             value={phone}
-            onChange={(event) => setPhone(event.target.value)}
+            onChange={(event) => setPhone(normalizePhoneInput(event.target.value))}
             type="text"
             inputMode="tel"
+            pattern="[0-9+()\\-\\s]{7,20}"
+            title="Enter a valid phone number"
             placeholder="Enter phone number"
             required
           />

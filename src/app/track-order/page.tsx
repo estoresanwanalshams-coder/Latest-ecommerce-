@@ -1,25 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { fetchSupabaseOrdersByLookup, type OrderRecord } from "@/lib/supabase-orders";
+import { fetchSupabaseOrdersByIdentifier, type OrderRecord } from "@/lib/supabase-orders";
 
 export default function TrackOrderPage() {
-  const [orderNumber, setOrderNumber] = useState("");
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [order, setOrder] = useState<OrderRecord | null>(null);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const value = identifier.trim();
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    const isOrderOrPhone = /^(ORD[-\w]+|[+()\-\s\d]{6,})$/i.test(value);
+    if (!isEmail && !isOrderOrPhone) {
+      setMessage("Enter a valid email address or order/phone number.");
+      return;
+    }
+
     setIsLoading(true);
     setMessage("");
     setOrder(null);
 
     try {
-      const matches = await fetchSupabaseOrdersByLookup(email, orderNumber);
+      const matches = await fetchSupabaseOrdersByIdentifier(identifier);
       if (matches.length === 0) {
-        setMessage("No order found for this Order ID and email.");
+        setMessage("No order found for this email or number.");
       } else {
         setOrder(matches[0]);
       }
@@ -35,26 +42,17 @@ export default function TrackOrderPage() {
       <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-zinc-950">Track Order</h1>
         <p className="mt-2 text-sm text-zinc-600">
-          Enter your Order ID and email address to check the latest status.
+          Enter your email address or order/phone number to check the latest status.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 grid gap-4 rounded-xl border border-zinc-200 bg-white p-5">
           <label className="light-form-field">
-            Order ID
+            Email or Order/Phone Number
             <input
-              value={orderNumber}
-              onChange={(event) => setOrderNumber(event.target.value)}
-              placeholder="ORD-XXXX"
-              required
-            />
-          </label>
-          <label className="light-form-field">
-            Email Address
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
+              type="text"
+              value={identifier}
+              onChange={(event) => setIdentifier(event.target.value)}
+              placeholder="you@example.com or ORD-XXXX or +971..."
               required
             />
           </label>

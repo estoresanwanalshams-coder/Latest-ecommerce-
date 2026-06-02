@@ -42,11 +42,20 @@ export async function POST(request: Request) {
     }
 
     const itemsText = formatItems(payload.items ?? []);
+    const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+    const isPublicSiteUrl =
+      !!configuredSiteUrl && !/localhost|127\.0\.0\.1/i.test(configuredSiteUrl);
+    const siteUrl = isPublicSiteUrl
+      ? configuredSiteUrl
+      : "https://www.hmshoponline.com";
+    const trackUrl = `${siteUrl.replace(/\/$/, "")}/track-order`;
     const customerSubject = `Order ${payload.orderNumber} placed successfully`;
     const customerText =
       `Hi ${payload.fullName},\n\n` +
       `Your order ${payload.orderNumber} has been placed successfully.\n` +
       `Our team will contact you shortly.\n\n` +
+      `You can track your order using your Order ID, email or phone number here:\n${trackUrl}\n\n` +
+      `Please check your spam folder too for order details.\n\n` +
       `Order summary:\n${itemsText}\n\n` +
       `Total: AED ${payload.total}\n\n` +
       `Thanks for shopping with us.`;
@@ -77,9 +86,14 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "Unknown error";
+    console.error("Order notify email error:", error);
     return NextResponse.json(
-      { error: "Unable to send order emails." },
+      {
+        error: "Unable to send order emails.",
+        ...(process.env.NODE_ENV !== "production" ? { detail } : {}),
+      },
       { status: 500 },
     );
   }

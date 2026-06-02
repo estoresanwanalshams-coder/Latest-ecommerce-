@@ -51,9 +51,14 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "Unknown error";
+    console.error("Contact email error:", error);
     return NextResponse.json(
-      { error: "Unable to send contact emails." },
+      {
+        error: "Unable to send contact emails.",
+        ...(process.env.NODE_ENV !== "production" ? { detail } : {}),
+      },
       { status: 500 },
     );
   }

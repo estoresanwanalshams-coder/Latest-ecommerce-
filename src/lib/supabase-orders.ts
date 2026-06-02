@@ -134,6 +134,25 @@ export async function fetchSupabaseOrdersByLookup(
   return (data ?? []).map((row) => mapOrderRow(row as OrderRow));
 }
 
+export async function fetchSupabaseOrdersByIdentifier(identifier: string) {
+  const normalized = identifier.trim();
+  if (!normalized) {
+    return [];
+  }
+
+  // Use a security-definer RPC so guests (anon role) can track their own
+  // orders by email / order number / phone without a blanket SELECT policy.
+  const { data, error } = await supabase.rpc("track_order", {
+    p_identifier: normalized,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return ((data as OrderRow[] | null) ?? []).map((row) => mapOrderRow(row));
+}
+
 export async function updateSupabaseOrderStatus(
   id: string,
   status: OrderStatus,

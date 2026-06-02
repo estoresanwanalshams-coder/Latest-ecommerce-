@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isValidPhoneNumber, normalizePhoneInput } from "@/lib/phone";
 
 const contactNumber = "+971 55 931 9338";
 
@@ -13,6 +14,11 @@ export default function ContactPage() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!isValidPhoneNumber(phone)) {
+      setNotice("Please enter a valid phone number (7 to 15 digits).");
+      return;
+    }
 
     const response = await fetch("/api/contact", {
       method: "POST",
@@ -74,7 +80,12 @@ export default function ContactPage() {
                 type="tel"
                 placeholder="+971 Enter phone number"
                 value={phone}
-                onChange={(event) => setPhone(event.target.value)}
+                onChange={(event) =>
+                  setPhone(normalizePhoneInput(event.target.value))
+                }
+                inputMode="tel"
+                pattern="[0-9+()\\-\\s]{7,20}"
+                title="Enter a valid phone number"
                 required
               />
             </label>

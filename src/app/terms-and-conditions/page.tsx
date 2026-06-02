@@ -1,43 +1,23 @@
 export default function TermsAndConditionsPage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-16 text-zinc-800">
-      <h1 className="mb-8 text-4xl font-bold">
-        Terms & Conditions
-      </h1>
-
-      <div className="space-y-6 leading-8">
-        <p>
-          Welcome to Storefront. By accessing this website,
-          you agree to comply with our terms and conditions.
-        </p>
-
-        <h2 className="text-2xl font-semibold">
-          Orders & Payments
-        </h2>
-
-        <p>
-          All payments are securely processed through trusted
-          payment gateways.
-        </p>
-
-        <h2 className="text-2xl font-semibold">
-          Shipping
-        </h2>
-
-        <p>
-          Delivery timelines may vary depending on location
-          and logistics availability.
-        </p>
-
-        <h2 className="text-2xl font-semibold">
-          Privacy
-        </h2>
-
-        <p>
-          Your information is protected using secure
-          encryption technologies.
-        </p>
+    <section className="page-shell">
+      <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8 text-zinc-800">
+        <h1 className="text-4xl font-bold text-zinc-950">Terms & Conditions</h1>
+        <div className="mt-6 space-y-5 leading-7 text-zinc-700">
+          <p>
+            This is placeholder terms and conditions content. Replace it with your final legal
+            terms before launch.
+          </p>
+          <p>
+            By using this website, customers agree to policies related to orders, payments,
+            shipping, cancellations, returns, and account usage.
+          </p>
+          <p>
+            You can include governing law, dispute resolution, liability limitations, and policy
+            update clauses in this page.
+          </p>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
