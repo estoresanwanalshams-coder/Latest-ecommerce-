@@ -102,7 +102,7 @@ export async function HomePageContent() {
         <HomeProductCarousel
           title="Featured Products"
           linkLabel="Shop Featured"
-          href="/featured"
+          href="/products"
           products={featuredProducts}
         />
 
